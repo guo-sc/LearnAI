@@ -1,0 +1,20 @@
+第二次线下课程预习内容
+
+1. 美国大选数据
+https://www.kaggle.com/fivethirtyeight/2016-election-polls
+
+预习要求：
+a. 下载数据，熟悉数据内容格式
+b. 思考如何根据数据回答如下问题：
+
+What are the trends of the polls over time (by day/week/month)?
+How do the trends vary by state?
+What is the probability that Trump/Clinton will win the 2016 election?
+
+
+2. 共享单车数据
+https://www.kaggle.com/c/bike-sharing-demand/overview
+
+预习要求：
+a. 下载数据，熟悉数据格式，阅读比赛要求
+b. 思考在比赛开始前，需要做那些数据分析

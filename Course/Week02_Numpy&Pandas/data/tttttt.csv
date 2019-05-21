@@ -1,0 +1,7 @@
+index	year	city	population	debt	western
+one	2018	Beijing	999999		False
+two	2019	Shanghai	2300	100.0	False
+three	2018	Guangzhou	1000	200.0	False
+four	2019	Shenzhen	700		False
+five	2018	Hangzhou	500	300.0	False
+six	2018	Chongqing	500		True

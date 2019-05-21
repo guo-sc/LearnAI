@@ -1,0 +1,1 @@
+The core idea of the HOG feature is that in an image
