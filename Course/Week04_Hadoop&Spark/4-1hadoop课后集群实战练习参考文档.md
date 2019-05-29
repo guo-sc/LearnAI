@@ -49,8 +49,8 @@ head text1.txt | python count_mapper.py | sort -k1,1 | python count_reducer.py >
 
 ### 运行MapReduce程序
 
-hadoop jar hadoop-streaming-2.8.5.jar  -D mapreduce.job.name="5642214_test" -file code/count_mapper.py  -mapper code/count_mapper.py  -file code/count_reducer.py -reducer code/count_reducer.py -input /sxy-new/5642214/input*  -output /sxy-new/5642214/output/1
+hadoop jar hadoop-streaming-2.8.5.jar  -D mapreduce.job.name="497809_test" -file code/count_mapper.py  -mapper code/count_mapper.py  -file code/count_reducer.py -reducer code/count_reducer.py -input /sxy-new/497809/input*  -output /sxy-new/497809/output/1
 
 ### 获取结果数据
 
-hadoop fs -getmerge /sxy-new/5642214/output/1 output.txt
+hadoop fs -getmerge /sxy-new/497809/output/1 output.txt
