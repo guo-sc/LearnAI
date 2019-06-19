@@ -1,0 +1,104 @@
+﻿环境变量设置
+%JAVA_HOME% = D:\Java\jdk1.8.0_131
+Path 添加
+D%JAVA_HOME%\;%JAVA_HOME%\bin;
+
+%HADOOP_STREAM% = %HADOOP_HOME%\share\hadoop\tools\lib\hadoop-streaming-2.6.1.jar
+%HADOOP_HOME% = D:\hadoop-2.6.5
+
+Path 添加 %HADOOP_HOME%\bin;%HADOOP_HOME%\sbin;%HADOOP_HOME%\share\hadoop\common\*;%HADOOP_HOME%\share\hadoop\hdfs;%HADOOP_HOME%\share\hadoop\hdfs\lib\*;%HADOOP_HOME%\share\hadoop\hdfs\*;%HADOOP_HOME%\share\hadoop\yarn\lib\*;%HADOOP_HOME%\share\hadoop\yarn\*;%HADOOP_HOME%\share\hadoop\mapreduce\lib\*;%HADOOP_HOME%\share\hadoop\mapreduce\*;%HADOOP_HOME%\share\hadoop\common\lib\*;
+
+
+###################################################################################################
+# 启动hadoop
+
+hdfs namenode –format 首次执行
+y
+
+start-dfs.cmd
+start-yarn.cmd
+
+hadoop fs -mkdir /wc /wc/input
+hadoop fs -put C:\hadoop_example_koubei-master\input\shop_info /wc/input/shop_info
+hadoop fs -put C:\hadoop_example_koubei-master\input\user_pay /wc/input/user_pay
+hadoop fs -rm -r /wc/output
+
+
+根据文章Installing Hadoop-2.6.x on Windows 10.安装hadoop时候。直接解压到D盘，就可以少改点东西
+注意，一定要双引号"D:\Python36\python map.py",在streaming模式默认hadoop会把map输出的一行中遇到
+的第一个设定的字段分隔符前面的部分作为key，后面的作为 value，如果输出的一行中没有指定的字段分隔符
+，则整行作为key，value被设置为空字符串.hadoop默认“\t”为分隔符。
+stream.num.map.output.key.fields 设置map输出的前几个字段作为key
+stream.map.output.field.separator 设置map输出的字段分隔符
+###################################################################################################
+
+hadoop fs -cat /wc/shop_info_fill_nan/part-00000
+hadoop fs -rm -r /wc/shop_info_fill_nan
+
+# 处理缺失值
+hadoop jar E:\hadoop-2.6.5\share\hadoop\tools\lib\hadoop-streaming-2.6.5.jar ^
+ -D stream.num.map.output.key.fields=1 ^
+ -input /wc/input/shop_info ^
+ -output /wc/shop_info_fill_nan ^
+ -mapper "E:\Python36\python C:\hadoop_example_koubei-master\fill_miss_nan_mapper.py" ^
+ -file C:\hadoop_example_koubei-master\fill_miss_nan_mapper.py
+
+
+################################################################################################### 
+hadoop fs -cat /wc/count_output/part-00000
+hadoop fs -rm -r /wc/count_output
+
+
+# 统计商家每日客流量
+hadoop jar E:\hadoop-2.6.5\share\hadoop\tools\lib\hadoop-streaming-2.6.5.jar ^
+ -D stream.num.map.output.key.fields=2 ^
+ -input /wc/input/user_pay ^
+ -output /wc/count_output ^
+ -mapper "E:\Python36\python C:\hadoop_example_koubei-master\shop_deal_cnt_mapper.py" ^
+ -reducer "E:\Python36\python C:\hadoop_example_koubei-master\shop_deal_cnt_reducer.py" ^
+ -combiner "E:\Python36\python C:\hadoop_example_koubei-master\shop_deal_cnt_reducer.py" ^
+ -file C:\hadoop_example_koubei-master\shop_deal_cnt_mapper.py C:\hadoop_example_koubei-master\shop_deal_cnt_reducer.py
+
+ 
+ 
+################################################################################################### 
+hadoop fs -cat /wc/shop_combine_count_output/part-00000
+hadoop fs -rm -r /wc/shop_combine_count_output
+
+# 对商家每日客流量表格和商家信息表格进行连接
+ 
+hadoop jar E:\hadoop-2.6.5\share\hadoop\tools\lib\hadoop-streaming-2.6.5.jar ^
+ -D stream.num.map.output.key.fields=1 ^
+ -input /wc/shop_info_fill_nan ^
+ -input /wc/count_output/* ^
+ -output /wc/shop_combine_count_output ^
+ -mapper "E:\Python36\python C:\hadoop_example_koubei-master\shop_combine_deal_mapper.py" ^
+ -reducer "E:\Python36\python C:\hadoop_example_koubei-master\shop_combine_deal_reducer.py" ^
+ -file C:\hadoop_example_koubei-master\shop_combine_deal_mapper.py C:\hadoop_example_koubei-master\shop_combine_deal_reducer.py
+ 
+ 
+###################################################################################################
+hadoop fs -cat /wc/class_count_avg_output/part-00000
+hadoop fs -rm -r /wc/class_count_avg_output
+ 
+ # 求商家日均客流量
+ 
+ hadoop jar E:\hadoop-2.6.5\share\hadoop\tools\lib\hadoop-streaming-2.6.5.jar ^
+ -D stream.num.map.output.key.fields=2 ^
+ -input /wc/shop_combine_count_output/* ^
+ -output /wc/class_count_avg_output ^
+ -mapper "E:\Python36\python C:\hadoop_example_koubei-master\shop_deal_avg_mapper.py" ^
+ -reducer "E:\Python36\python C:\hadoop_example_koubei-master\shop_deal_avg_reducer.py" ^
+ -file C:\hadoop_example_koubei-master\shop_deal_avg_mapper.py C:\hadoop_example_koubei-master\shop_deal_avg_reducer.py
+
+ # 将日均客流量拷贝会主机
+hadoop fs –get /wc/class_count_avg_output C:\hadoop_example_koubei-master\output\class_count_avg_output
+ 
+hadoop fs –put F:\koubei\dataset\dataset\user_pay.txt /wc/input/shop_payNum
+ 
+
+测试程序
+见test.py
+
+
+

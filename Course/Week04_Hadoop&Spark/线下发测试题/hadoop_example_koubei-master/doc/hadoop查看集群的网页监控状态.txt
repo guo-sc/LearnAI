@@ -1,0 +1,11 @@
+1.查看hdfs集群状态，也就是namenode的访问地址
+
+配置：hdfs-site.xml--dfs.namenode.http-address
+
+默认访问地址：http://namenode的ip:50070
+
+2.查看yarn集群的状态
+
+配置：yarn-site.xml--yarn.resourcemanager.webapp.address
+
+默认访问地址：http://resource manager的ip:8088
