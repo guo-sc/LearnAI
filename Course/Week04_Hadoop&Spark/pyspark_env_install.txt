@@ -1,0 +1,17 @@
+1. 进入阿里云的机器，默认登陆shell，需要熟悉shell基本命令
+
+2. 下载安装 anaconda
+
+wget https://repo.anaconda.com/archive/Anaconda3-2019.03-Linux-x86_64.sh
+
+sh Anaconda3-2019.03-Linux-x86_64.sh
+
+3. 安装pyspark
+pip install pyspark
+
+4. 安装jdk
+openjdk-8-jdk
+
+5. 把代码输入python脚本a.py
+
+spark-submit a.py执行
